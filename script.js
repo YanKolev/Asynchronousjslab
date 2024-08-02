@@ -51,7 +51,7 @@ getCountryData('usa');
 
 
 //Pulling out the render function from the original in order to call it 
-
+/*
 const renderCountry = function (data, className = ''){
 
  
@@ -68,9 +68,10 @@ const renderCountry = function (data, className = ''){
      countriesContainer.insertAdjacentHTML('beforeend', html);
      countriesContainer.style.opacity = 1;
 }
+*/
 
 
-
+/*
 //AJAX call country 1
 const getCountryAndNeighbour = function(country){
   const request =new XMLHttpRequest();
@@ -94,6 +95,7 @@ const getCountryAndNeighbour = function(country){
      WE CAN USE: 
      const neighbour = data.borders?.[0];
      */
+    /*
      if (!neighbour) return // used for like islands, wehre there are no neighbours
 
      //AJAX call country 2
@@ -120,6 +122,8 @@ const getCountryAndNeighbour = function(country){
  }
  getCountryAndNeighbour('austria');
 
+*/
+
  /*
  setTimeout (() =>{
   console.log(`1 second passed`),;
@@ -127,4 +131,39 @@ const getCountryAndNeighbour = function(country){
       console.log(`1 second passed`); 
     
  }, 1000)
+ */
+
+
+ //     ------------------Promises & Fetch API------------
+ 
+ //we will replace  xmlhttp request with fetch api 
+
+/* Original way of doing 
+  const request =new XMLHttpRequest();
+  request.open('GET', `https://restcountries.com/v2/name/${country}`)
+  request.send()
+
+*/
+
+ const request = fetch('https://restcountries.com/v2/name/portugal')
+ console.log(request); // prints a promise
+
+ // Promise definitions:
+ //Promise- An object that is used as a placeholder for the future result of an asynchronous operation. 
+ //-A container for an asynchronously delivered value. 
+ //-A container for future value (response from AJAX call)
+
+ //2 BIG ANDVANTAGES: 
+
+ //1- We no longer need to rely on events and callbacks passed into asynchronous functions to handle asynchronous results;
+ //2- Instead of nesting callbacks, we can chain promises for a sequence of asynchronous operations: escaping callback hell? 
+
+ /* 
+ Promise lifecycle: 
+ 
+ 1) Pending(before the future value is available) still works asynchronous task in the background
+ 2) Settled (asynchronous task has finished)-
+ 2.1) Fulfilled promises-> Succesfully resulted in a value
+ 2.2) Rejected promises => An eror happened 
+ 3) Build Promise (FETH API returns promis) -> Consume promise- when we have a promise-> promise returned from FETCH API 
  */

@@ -197,12 +197,50 @@ const getCountryAndNeighbour = function(country){
 
 //Linked with row 55 definition
 
+/*
 const getCountryData = function (country){
   fetch(`https://restcountries.com/v2/name/${country}`) //fetches something
   .then(response => response.json()) // waiting for a respose and converting to json
-  .then(data =>  renderCountry(data[0])); // takes the data and renders it to the DOM 
+  .then(data => {
+    renderCountry(data[0]); // takes the data and renders it to the DOM 
+    const neighbour = data[0].borders[0] //chaining he promises and adding neighbour
+
+    if (!neighbour) return;
+
+    //Country 2 - we need to retun this 2nd promise and then we can chain new then method on the result 
+    fetch(`https://restcountries.com/v2/alpha/${neighbour}`)
+   })
+  .then(response => response.json())
+  .then(data => renderCountry(data, 'neighbour'))
 }
 
 getCountryData('portugal');
 
 //Promises to get read of callbacks, but they do get rid off of callback hell. 
+*/
+
+const getCountryData = function (country) {
+  //Country 1
+  fetch(`https://restcountries.com/v2/name/${country}`)
+  .then(response => response.json())
+  .then(data =>{
+    renderCountry(data[0])
+    const neighbour = data[0].borders[0];
+
+    if (!neighbour) return;
+
+    //Country 2
+    return fetch(`https://restcountries.com/v2/alpha/${neighbour}`)
+  })
+  .then(response => response.json())
+  .then(data => renderCountry(data, 'neighbour'));
+};
+
+getCountryData('portugal');
+
+//Callbacks allow us to extend the asynchronous operations with as many steps as we want, 
+//we are currently 4 steps in (thens) and we can easily chain in one after another and all without callback hell
+//what we have here is called- flat chain of promises . 
+
+//DO NOT CHAIN THEN TO DIRECTLY TO A NEW NESTED PROMISE- (immediately on fetch, inside of the previous THEN method- BUT MAKES IT A CALLBACK METHOD)
+//ALWAYS RETURN THE PROMISE AND CONTINUE THE CHAIN OUTSIDE 

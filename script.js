@@ -51,7 +51,7 @@ getCountryData('usa');
 
 
 //Pulling out the render function from the original in order to call it 
-/*
+
 const renderCountry = function (data, className = ''){
 
  
@@ -68,7 +68,7 @@ const renderCountry = function (data, className = ''){
      countriesContainer.insertAdjacentHTML('beforeend', html);
      countriesContainer.style.opacity = 1;
 }
-*/
+
 
 
 /*
@@ -145,8 +145,13 @@ const getCountryAndNeighbour = function(country){
 
 */
 
+/*
  const request = fetch('https://restcountries.com/v2/name/portugal')
  console.log(request); // prints a promise
+*/
+
+
+
 
  // Promise definitions:
  //Promise- An object that is used as a placeholder for the future result of an asynchronous operation. 
@@ -167,3 +172,37 @@ const getCountryAndNeighbour = function(country){
  2.2) Rejected promises => An eror happened 
  3) Build Promise (FETH API returns promis) -> Consume promise- when we have a promise-> promise returned from FETCH API 
  */
+
+
+ //   ---------------- Consuming Promises ----------------------
+
+ //Chaining reponses 
+
+
+ //Older way of writing
+ /*
+ const request = fetch('https://restcountries.com/v2/name/portugal')
+ console.log(request);
+
+ const getCountryData = function(country) {
+  fetch(`https://restcountries.com/v2/name/${country}`).then(function(response){
+    console.log(response);
+     return response.json();
+  }).then(function(data){
+    console.log(data)
+    renderCountry(data[0])
+  })
+ }
+*/
+
+//Linked with row 55 definition
+
+const getCountryData = function (country){
+  fetch(`https://restcountries.com/v2/name/${country}`) //fetches something
+  .then(response => response.json()) // waiting for a respose and converting to json
+  .then(data =>  renderCountry(data[0])); // takes the data and renders it to the DOM 
+}
+
+getCountryData('portugal');
+
+//Promises to get read of callbacks, but they do get rid off of callback hell. 

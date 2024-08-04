@@ -66,7 +66,7 @@ const renderCountry = function (data, className = ''){
            </div>
          </article>`;
      countriesContainer.insertAdjacentHTML('beforeend', html);
-     countriesContainer.style.opacity = 1;
+     //countriesContainer.style.opacity = 1;
 }
 
 
@@ -219,10 +219,22 @@ getCountryData('portugal');
 //Promises to get read of callbacks, but they do get rid off of callback hell. 
 */
 
+//Function for rendering error 
+
+const renderError = function(msg){
+  countriesContainer.insertAdjacentText('beforeend', msg);
+  countriesContainer.style.opacity = 1
+}
+
+
+
+
+
+
 const getCountryData = function (country) {
   //Country 1
   fetch(`https://restcountries.com/v2/name/${country}`)
-  .then(response => response.json())
+  .then(response => response.json(), /*err => alert(err)*/) // catching the error with an alert here
   .then(data =>{
     renderCountry(data[0])
     const neighbour = data[0].borders[0];
@@ -232,11 +244,33 @@ const getCountryData = function (country) {
     //Country 2
     return fetch(`https://restcountries.com/v2/alpha/${neighbour}`)
   })
-  .then(response => response.json())
-  .then(data => renderCountry(data, 'neighbour'));
+  .then(response => response.json(), /*err => alert(err)*/) //catching the error in the second fetch 
+  .then(data => renderCountry(data, 'neighbour'))
+  .catch(err => {
+    console.error(`${err}`);
+    renderError (`Something went wrong ${err.message}.Try again!`)
+
+  
+  }) // Catches any errors that occur in the WHOLE PROMISE CHAIN, NO MATTER WHERE THAT IS-> As Errors propagate down the chain until they are caught 
+
+  //There is also the method finally that we can use to use.
+  //Then method is that we use when we promise is fullfilled,
+  //Catch method is called only when the promise is rejected,
+  //Finally method and its callback functions is called regardless- No matter if its called or rejected. We use it for something that always needs to hapen, no matter the result
+  .finally(()=>{
+    countriesContainer.style.opacity = 1; //works only because catch  returns a promise
+
+  })
+
+
 };
 
-getCountryData('portugal');
+btn.addEventListener('click', function(){
+  getCountryData('portugal');
+})
+
+//2 ways of handling rejection- 1st way- pass a second callback function into the then method (adding second callback when it was rejected- Line 225)
+//2nd way- to catch them by the end of the chain instead of adding another error callback inside => by adding catch method 
 
 //Callbacks allow us to extend the asynchronous operations with as many steps as we want, 
 //we are currently 4 steps in (thens) and we can easily chain in one after another and all without callback hell
@@ -244,3 +278,11 @@ getCountryData('portugal');
 
 //DO NOT CHAIN THEN TO DIRECTLY TO A NEW NESTED PROMISE- (immediately on fetch, inside of the previous THEN method- BUT MAKES IT A CALLBACK METHOD)
 //ALWAYS RETURN THE PROMISE AND CONTINUE THE CHAIN OUTSIDE 
+
+
+
+// ---- Error Handling in promises ----- 
+
+//A promise in which an error happened is a rejected promise, The only way in which the fetch promise rejects is when the user loses its  internet connection 
+//Adding content and button on line 239, check up 
+

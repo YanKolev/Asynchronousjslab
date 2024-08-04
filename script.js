@@ -226,16 +226,30 @@ const renderError = function(msg){
   countriesContainer.style.opacity = 1
 }
 
+// Helper function to FETCH , ERROR HANDLING AND CONVERSION TO JSON
+
+const getJSON = function(url, errorMsg = 'Something went wrong'){
+   return fetch(url).then(response => {
+    if(!response.ok) throw new Error(` ${errorMsg} (${response.status})`)
+
+    return response.json();
+  })
+}
 
 
-
-
+/* Keeping original function block as a refrence, re-doing it below  with the helper function
 
 const getCountryData = function (country) {
   //Country 1
   fetch(`https://restcountries.com/v2/name/${country}`)
-  .then(response => response.json(), /*err => alert(err)*/) // catching the error with an alert here
-  .then(data =>{
+  .then(response => {
+    console.log(response)
+
+      if(!response.ok)
+        throw new Error(`Country not found (${response.status})`) // throw will immediately terminate the current function, the promise will immediatelly REJECT, and propagate down to catch handler 
+    
+     return response.json()}, /*err => alert(err)*/ // catching the error with an alert here
+/*  .then(data =>{
     renderCountry(data[0])
     const neighbour = data[0].borders[0];
 
@@ -244,8 +258,8 @@ const getCountryData = function (country) {
     //Country 2
     return fetch(`https://restcountries.com/v2/alpha/${neighbour}`)
   })
-  .then(response => response.json(), /*err => alert(err)*/) //catching the error in the second fetch 
-  .then(data => renderCountry(data, 'neighbour'))
+  .then(response => response.json(), /*err => alert(err)*/ //catching the error in the second fetch 
+/*  .then(data => renderCountry(data, 'neighbour'))
   .catch(err => {
     console.error(`${err}`);
     renderError (`Something went wrong ${err.message}.Try again!`)
@@ -265,9 +279,41 @@ const getCountryData = function (country) {
 
 };
 
+*/
+
+const getCountryData = function (country){
+  //Country 1 
+
+  getJSON(`https://restcountries.com/v2/name/${country}`, 'Country not found')
+  .then(data => {
+    renderCountry(data[0]);
+    const neighbour = data[0].borders[0];
+
+    if(!neighbour) throw new Error('No neighbour found!');
+
+    //Country 2 
+
+    return getJSON(`https://restcountries.com/v2/alpha/${neighbour}`, 'Country not found')
+    .then(data => renderCountry(data, 'neighbour'))
+    .catch(err => {
+      console.error(`${err}`);
+      renderError(`Something went wrong ${errorMsg}, Try again`)
+    })
+    .finally(()=> {
+      countriesContainer.style.opacity = 1;
+    })
+
+  })
+}
+
+
+
+
 btn.addEventListener('click', function(){
   getCountryData('portugal');
 })
+
+getCountryData('australia')
 
 //2 ways of handling rejection- 1st way- pass a second callback function into the then method (adding second callback when it was rejected- Line 225)
 //2nd way- to catch them by the end of the chain instead of adding another error callback inside => by adding catch method 
@@ -285,4 +331,7 @@ btn.addEventListener('click', function(){
 
 //A promise in which an error happened is a rejected promise, The only way in which the fetch promise rejects is when the user loses its  internet connection 
 //Adding content and button on line 239, check up 
+
+// --- Throwing Errors Manually---
+// Adding blocks at line 237, getcountrydata,  under 1st fetch, response 
 

@@ -335,3 +335,30 @@ getCountryData('australia')
 // --- Throwing Errors Manually---
 // Adding blocks at line 237, getcountrydata,  under 1st fetch, response 
 
+
+// adding function from challenge to render country 
+
+const whereAmI = function(lat, lng){
+    
+  fetch(`https://geocode.xyz/${lat},${lng}?json=1`)
+  .then(response => {
+      if (!response.ok) throw new Error (`Problem with geocoding ${response.status}`)
+       return response.json()})
+  .then(data => {
+      console.log(data);
+      console.log(`You are in ${data.city}, ${data.country}`);
+
+      return fetch(`https://restcountries.com/v2/name/${data.country}`)
+  })
+  .then(response =>{
+      if(!response.ok)
+          throw new Error(`Country not found ${response.status}`)
+      return response.json();
+
+  })
+  .then(data=> renderCountry(data[0]))
+  .catch(err => console.error(`${err.message} !!!`))
+
+}
+
+whereAmI(-33.933, 18.474);

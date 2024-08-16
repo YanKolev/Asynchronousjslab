@@ -313,6 +313,8 @@ btn.addEventListener('click', function(){
   getCountryData('portugal');
 })
 
+
+
 getCountryData('australia')
 
 //2 ways of handling rejection- 1st way- pass a second callback function into the then method (adding second callback when it was rejected- Line 225)

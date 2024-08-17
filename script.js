@@ -364,3 +364,73 @@ const whereAmI = function(lat, lng){
 }
 
 whereAmI(-33.933, 18.474);
+
+
+/* 
+
+JS runtime is a container which includes all the different pieces that are necessary to execute JS code. 
+The heart of the runtime is the JS engine- where objects are stored in memory and also where the code is actually executed. 
+
+JS has only 1 thread of execution- ABSOLUTELY NO MULTI-TASKING. 
+After that it comes the web API enviourent- basically which the APIs are provided to the engine- which are not part of the JS language themselves
+( the DOM, fetch, times, location API, geolocation API )
+After that is the callback queue- which is a data structure  that holds  the ready to be executed callback functions(coming from events)
+Concurency model -> how JS handles multiple tasks happening at the same time
+The JS engine is build around the idea of single thread-
+
+-from the code snippet- loading image and fetching data will happen in the web api eniourment, otherwise
+we will block the callstack and add a huge lag on our application, 
+
+Callback queue is ordered list of all the callback functions that are to be executed, also a to-do list of a kind that the callstack needs to complete.
+
+
+Event loop- it looks into the callstack and it determines if its empty or not, except of th eglobal context, 
+if its empty- it will take the first callback from the callback queue and put it in the callstack to be executed
+this is called- event loop tick.  
+The event loop- makes the coordination between the call stack and the callbacks in the  callback queue. 
+JS language has no sense of time-  everything that is asynchronous happens outside of the engine.
+Its the runtime that manages the whole asynchronous behaviour, and its event loop which decides which code will be learned next. 
+The engine itself simply executes whichever code is given. 
+
+
+
+
+
+
+*/
+
+/*
+
+//Snippet code example
+el = document.querySelector('img');
+el.src = 'dog.jpg';
+el.addEventListener('load', () => {
+  el.classList.add('fadeIn');
+});
+
+fetch('https://someurl.com/api')
+  .then(res => console.log(res))
+
+
+*/
+ 
+/*
+-Image started loading asynchronously in the webAPIs enviourment and NOT IN THE CALLSTACK.
+-Then we use addeventlistener to attach a callback function to the image load event -> THIS callback is basically our asynchronous code. Code that we deffered in the future ->once the image is loaded.
+-Addevent listened did not put the callback directly in the callback queue, it simply registered the callback, WHICH THEN kept waiting in the WEB APIS-> UNTIL THE LOAD EVENT IS FIRED OFF
+- After the event is fired off, then the enviourment put the callback in the queue, then while in the queue, 
+the callback is waiting for the event loop to pick it up and put on the call stack - all of this happens as the callback is first in line and the callstack was empty. 
+
+All of this happened so the image does not have to load in the callstack but in the background. 
+The web apis, callback queue and event loop make it possible for asynchronous code to be executed even with 1 theread of execution in the engine. 
+
+- we need fetch the data with a promise, the fetch is done, callbacks related to promises do not go into the Callback queue- will not be moved in the callbak queue
+- Callbacks of promises have a special queue for themselves - so called- MICROTASKS queue- It has priority over the callback queue-
+- at the end of an event loop tick-  the event loop will check if there are any callbacks in the microtask queue -> if there are it will run all of them. 
+-before it runs any more callbacks from the regular callback queue.
+- If one microtask ads a new microtask then that new microtask is also executed before any callbacks from the callbak queue. 
+- this means that maybe the microtask queue can starve the callback queue-> This is never a problem, but a possibility. 
+
+- The idea of running asynchronous code with regular callbacks and microtasks coming from promises is very similar - The only differences is that they go in different queues 
+- and the evento loop gives microtasks PRIORITY OVER regular callbacks. 
+*/

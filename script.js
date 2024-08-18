@@ -413,7 +413,7 @@ fetch('https://someurl.com/api')
 
 
 */
- 
+
 /*
 -Image started loading asynchronously in the webAPIs enviourment and NOT IN THE CALLSTACK.
 -Then we use addeventlistener to attach a callback function to the image load event -> THIS callback is basically our asynchronous code. Code that we deffered in the future ->once the image is loaded.
@@ -434,3 +434,22 @@ The web apis, callback queue and event loop make it possible for asynchronous co
 - The idea of running asynchronous code with regular callbacks and microtasks coming from promises is very similar - The only differences is that they go in different queues 
 - and the evento loop gives microtasks PRIORITY OVER regular callbacks. 
 */
+
+
+
+
+
+/* Asynchronous loop practice: */ 
+
+console.log(`Test start`)
+setTimeout(() => console.log('0 sec timer'),  0) //timer which should call this function exactly after 0 seconds 
+//after 0 seconds this callback will be putback on the callback queue. 
+Promise.resolve('Resolved promise 1').then(res => console.log(res));
+
+Promise.resolove('Resoloved promise 2'). then (res => {
+  for (let i = 0; i < 1000000; i++) {} //this microtask will take a lot of time for counting
+  console.log(res)
+})
+console.log('Test end');
+
+//NB! Avoid using JS timers for high precision things. Or stacking timers with microtasks. 

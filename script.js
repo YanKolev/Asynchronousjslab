@@ -453,3 +453,43 @@ Promise.resolove('Resoloved promise 2'). then (res => {
 console.log('Test end');
 
 //NB! Avoid using JS timers for high precision things. Or stacking timers with microtasks. 
+
+
+//Manually building promise
+
+const lotteryPromise = new Promise(function(resolve, reject){
+
+  console.log('Lottery draw is happening!')
+  // using the timer we encapsulated some asynchronous behaviour into this promise
+  setTimeout(function(){
+    if(Math.random() >= 0.5){
+      resolve('You Win!')
+    } else {
+      reject(new Error('You lost your money!'));
+    }
+
+  },2000)// 2000= 2 seconds
+
+
+})
+
+//consuming the promise
+lotteryPromise.then(res => console.log(res)).catch(err => console.error(err)) //consuming the promise here
+
+//promisify the set timeout function 
+//we do not need the reject parameter as its impossible for the timer to fail
+
+const wait = function(seconds){
+  return new Promise(function(resolove){
+    setTimeout(resolove,seconds * 1000)
+  })
+}
+
+wait(2).then(() => {
+  console.log('I waited for 2 seconds')
+  return wait(1);
+}).then(()=> console.log('I waited for 1 second'))
+
+//creating a rejected promise immediately
+Promise.resolve('abc').then (x => console.log(x));
+Promise.reject(new Error('Problem!')).catch(x => console.error(x))

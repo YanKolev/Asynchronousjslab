@@ -307,7 +307,7 @@ const getCountryData = function (country){
 }
 
 
-
+/*
 
 btn.addEventListener('click', function(){
   getCountryData('portugal');
@@ -316,6 +316,9 @@ btn.addEventListener('click', function(){
 
 
 getCountryData('australia')
+
+
+*/
 
 //2 ways of handling rejection- 1st way- pass a second callback function into the then method (adding second callback when it was rejected- Line 225)
 //2nd way- to catch them by the end of the chain instead of adding another error callback inside => by adding catch method 
@@ -340,6 +343,7 @@ getCountryData('australia')
 
 // adding function from challenge to render country 
 
+/*
 const whereAmI = function(lat, lng){
     
   fetch(`https://geocode.xyz/${lat},${lng}?json=1`)
@@ -365,6 +369,7 @@ const whereAmI = function(lat, lng){
 
 whereAmI(-33.933, 18.474);
 
+*/ 
 
 /* 
 
@@ -441,6 +446,8 @@ The web apis, callback queue and event loop make it possible for asynchronous co
 
 /* Asynchronous loop practice: */ 
 
+/*
+
 console.log(`Test start`)
 setTimeout(() => console.log('0 sec timer'),  0) //timer which should call this function exactly after 0 seconds 
 //after 0 seconds this callback will be putback on the callback queue. 
@@ -480,8 +487,8 @@ lotteryPromise.then(res => console.log(res)).catch(err => console.error(err)) //
 //we do not need the reject parameter as its impossible for the timer to fail
 
 const wait = function(seconds){
-  return new Promise(function(resolove){
-    setTimeout(resolove,seconds * 1000)
+  return new Promise(function(reslove){
+    setTimeout(reslove,seconds * 1000)
   })
 }
 
@@ -493,3 +500,60 @@ wait(2).then(() => {
 //creating a rejected promise immediately
 Promise.resolve('abc').then (x => console.log(x));
 Promise.reject(new Error('Problem!')).catch(x => console.error(x))
+
+*/
+
+
+// Promisifying geolocation API: 
+
+//Getting from callback based API to promisebased API: 
+
+//navigator.geolocation.getCurrentPosition(position => console.log(position), err => console.error(err))
+
+
+const getPosition = function(){
+  return new Promise(function(resolve, reject ){
+    navigator.geolocation.getCurrentPosition(position => resolve(position), 
+    err => reject(err))
+  })
+
+  //another variant 
+    //navigator.geolocation.getCurrentPosition(resolove, reject)
+
+}
+
+getPosition().then(pos => console.log(pos))
+
+//Code from the challenge that we can use for the promisifying of the geolocation.
+
+const whereAmI = function(){
+  getPosition().then(pos =>{
+    const {latitude: lat, longitude: lng} = pos.coords;
+
+    return fetch(`https://geocode.xyz/${lat},${lng}?json=1`)
+
+  })
+
+    
+  
+  .then(response => {
+      if (!response.ok) throw new Error (`Problem with geocoding ${response.status}`)
+       return response.json()})
+  .then(data => {
+      console.log(data);
+      console.log(`You are in ${data.city}, ${data.country}`);
+
+      return fetch(`https://restcountries.com/v2/name/${data.country}`)
+  })
+  .then(response =>{
+      if(!response.ok)
+          throw new Error(`Country not found ${response.status}`)
+      return response.json();
+
+  })
+  .then(data=> renderCountry(data[0]))
+  .catch(err => console.error(`${err.message} !!!`))
+
+}
+
+btn.addEventListener('click', whereAmI);

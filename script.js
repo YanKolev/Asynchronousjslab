@@ -510,6 +510,7 @@ Promise.reject(new Error('Problem!')).catch(x => console.error(x))
 
 //navigator.geolocation.getCurrentPosition(position => console.log(position), err => console.error(err))
 
+/*
 
 const getPosition = function(){
   return new Promise(function(resolve, reject ){
@@ -521,6 +522,8 @@ const getPosition = function(){
     //navigator.geolocation.getCurrentPosition(resolove, reject)
 
 }
+
+
 
 getPosition().then(pos => console.log(pos))
 
@@ -557,3 +560,53 @@ const whereAmI = function(){
 }
 
 btn.addEventListener('click', whereAmI);
+
+
+*/
+
+
+//Consuming promises with async Await 
+
+//reacreating the whereamI function with a twist
+//adding async, to make it an async function-> keep running in the background while performing the code thats inside and automatically returns a promise
+// we can have 1 or more await statements
+
+
+
+
+
+const getPosition = function(){
+  return new Promise(function(resolve, reject ){
+    navigator.geolocation.getCurrentPosition(position => resolve(position), 
+    err => reject(err))
+  })
+
+  //another variant 
+    //navigator.geolocation.getCurrentPosition(resolove, reject)
+
+}
+
+const whereAmI = async function (){
+  const pos  = await getPosition();
+  const {latitude: lat, longitude: lng} = pos.coords;
+
+    const resGeo = await  fetch(`https://geocode.xyz/${lat},${lng}?json=1`);
+    const dataGeo = await resGeo.json();
+    console.log(dataGeo);
+
+  const res = await fetch(`https://restcountries.com/v2/name/${dataGeo.country}`)
+  const data =  await res.json();
+  console.log(data);
+  renderCountry(data[0])
+
+  //alternative of 
+  //fetch(`https://restcountries.com/v2/name/${data.country}`).then(res => console.log(res))
+
+}
+//stopping execution in asynch function is not a problem, its not blockng the main thread of execution, ITS NOT  BLOCKING THE MAIN STACK
+
+whereAmI();
+
+console.log('first');
+//async await is syntactic sugar over the THEN method in promises. still using promises, just a different way of consuming htem 
+

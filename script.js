@@ -595,16 +595,24 @@ const whereAmI = async function (){
     if (!resGeo.ok) throw new Error('Problem getting location data')
 
     const dataGeo = await resGeo.json();
-    console.log(dataGeo);
+    
 
   const res = await fetch(`https://restcountries.com/v2/name/${dataGeo.country}`)
   if (!res.ok) throw new Error('Problem getting country')
 
   const data =  await res.json();
   console.log(data);
-  renderCountry(data[0]) } catch (err) {
+  renderCountry(data[0]);
+
+  
+  return `You are in ${dataGeo.city}, ${dataGeo.country}`;
+
+  } catch (err) {
     console.error(err);
-    renderError(` ${err.message}`)
+    renderError(` ${err.message}`);
+
+    //reject promise returned from async function 
+    throw err;
   }
 
   //alternative of 
@@ -612,10 +620,39 @@ const whereAmI = async function (){
 
 }
 //stopping execution in asynch function is not a problem, its not blockng the main thread of execution, ITS NOT  BLOCKING THE MAIN STACK
+console.log(`1: will get location`)
+//const city = whereAmI();
+//console.log(city); // NB!!! Async function always returns a promise HERE WE GET A PROMISE AND NOT A VALUE 
 
-whereAmI();
+/*
+whereAmI()
+.then(city => console.log(`2: ${city}`))
+.catch(err => console.error(`2: ${err.message}`))
+.finally(() => console.log('3: finished getting location'))
+*/
 
-console.log('first');
+/* 
+Even if there is a error,(for example undefined-> where nothing is returned from the function)
+the log will work, which means that the callback function is still running, then method was called, 
+which means that the promise was fulfilled and NOT REJECTED,
+if we add catch handler we can get the error, but the callback on 2 city will be UNDEFINED
+THE PROMISE IS STILL FULFILLED , if we want to catch it, we need to re-throw the error so we can propagate it down at RENDER ERROR
+*/
+
+//Making an iffy function- which is immediately executed- 
+
+
+
+
+(async function (){
+  try{
+    const city = await whereAmI(); // returning data from async function
+    console.log(`2: ${city}`);
+  } catch(err){
+    console.error(`2: ${err.message}`);
+  }
+  console.log(`3: Finished getting location`);
+})();
 //async await is syntactic sugar over the THEN method in promises. still using promises, just a different way of consuming htem 
 
 
@@ -635,3 +672,6 @@ try{
 
 */
 
+
+
+//Returning values from async Functions. 

@@ -642,7 +642,7 @@ THE PROMISE IS STILL FULFILLED , if we want to catch it, we need to re-throw the
 //Making an iffy function- which is immediately executed- 
 
 
-
+/*
 
 (async function (){
   try{
@@ -653,6 +653,9 @@ THE PROMISE IS STILL FULFILLED , if we want to catch it, we need to re-throw the
   }
   console.log(`3: Finished getting location`);
 })();
+
+*/
+
 //async await is syntactic sugar over the THEN method in promises. still using promises, just a different way of consuming htem 
 
 
@@ -675,3 +678,46 @@ try{
 
 
 //Returning values from async Functions. 
+
+
+
+// Running promises in parallel
+
+const get3Countries = async function(c1, c2, c3) {
+  try {
+    /*
+    const [data1] = await getJSON(`https://restcountries.com/v2/name/${c1}`)
+    const [data2] = await getJSON(`https://restcountries.com/v2/name/${c2}`)
+    const [data3] = await getJSON(`https://restcountries.com/v2/name/${c3}`)
+
+    console.log([data1.capital,data2.capital,data3.capital])
+
+    */
+
+
+    // this will return a new promise that return all of these promises at the same time 
+    // then we can handle it as a promise 
+    const data4 =  await Promise.all([
+      getJSON(`https://restcountries.com/v2/name/${c1}`),
+      getJSON(`https://restcountries.com/v2/name/${c2}`),
+      getJSON(`https://restcountries.com/v2/name/${c3}`)
+
+
+    ]);
+    console.log(data4.map(d => d[0].capital))
+    
+    
+
+  }catch(err){
+    console.error(err)
+  }
+  
+}
+
+get3Countries('portugal', 'canada', 'tanzania')
+
+/* 
+Running all of the 3 ajax calls one after the other, even though the result of the second one 
+does not depend on the 1st, nor the result of the 3rd depend on any of the previous. 
+ Promise. all- is a combinator functions which allows us to combine the promises. 
+*/

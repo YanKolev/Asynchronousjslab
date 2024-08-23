@@ -587,17 +587,25 @@ const getPosition = function(){
 }
 
 const whereAmI = async function (){
+  try{
   const pos  = await getPosition();
   const {latitude: lat, longitude: lng} = pos.coords;
 
     const resGeo = await  fetch(`https://geocode.xyz/${lat},${lng}?json=1`);
+    if (!resGeo.ok) throw new Error('Problem getting location data')
+
     const dataGeo = await resGeo.json();
     console.log(dataGeo);
 
   const res = await fetch(`https://restcountries.com/v2/name/${dataGeo.country}`)
+  if (!res.ok) throw new Error('Problem getting country')
+
   const data =  await res.json();
   console.log(data);
-  renderCountry(data[0])
+  renderCountry(data[0]) } catch (err) {
+    console.error(err);
+    renderError(` ${err.message}`)
+  }
 
   //alternative of 
   //fetch(`https://restcountries.com/v2/name/${data.country}`).then(res => console.log(res))
@@ -609,4 +617,21 @@ whereAmI();
 
 console.log('first');
 //async await is syntactic sugar over the THEN method in promises. still using promises, just a different way of consuming htem 
+
+
+// Error handling with Async away/ Ajax
+
+// we will use a Try... catch statement block-> to catch errors in async functions
+
+/*
+
+try{
+  let y = 1;
+  const x = 2;
+  x = 3; // it will give us an arrer that we can not re-assign a constant variable, 
+} catch(err){
+  alert(err.message); //any error has the message property so we can use it for the alert 
+} // will have access to whatever error occurs in the try block.
+
+*/
 

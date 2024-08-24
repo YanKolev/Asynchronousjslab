@@ -721,3 +721,71 @@ Running all of the 3 ajax calls one after the other, even though the result of t
 does not depend on the 1st, nor the result of the 3rd depend on any of the previous. 
  Promise. all- is a combinator functions which allows us to combine the promises. 
 */
+
+
+//Other Promise Combinators: race, allSettled and any
+
+//Promise.race - receives an array of promises and also returns a promise.
+//The promise returned by Promise.race is settled as soon as one of the input promises settles, settle means that a value is available
+//it doesnt mean that the promise got rejected or fullfilled. 
+//Basically the first settled promise wins the race. 
+//only the winning promise will be the fullfilled one.
+//Promise.race is very useful to prevent against never ending promises OR very long promises.
+
+(async function() {
+  const res = await Promise.race([ 
+    getJSON(`https://restcountries.com/v2/name/italy`),
+    getJSON(`https://restcountries.com/v2/name/egypt`),
+    getJSON(`https://restcountries.com/v2/name/mexico`)
+  ])
+  console.log(res[0]);
+})()
+
+
+/*
+Case- user has a very bad internet connection, then fetch request in the application that u are building 
+might take way too long to actually be useful, so can create a special time-out promise, which automatically
+rejects after certain amout of time is passed, 
+similar to the wait function- it will going to REJECT insteat of resolved
+*/
+
+const timeout = function(sec) {
+  return new Promise(function(_, reject){
+    setTimeout(function(){
+      reject(new Error(`Request took too long!`))
+
+    },sec * 1000)
+
+  })
+}
+Promise.race([
+  getJSON(`https://restcountries.com/v2/name/tanzania`),
+   timeout(0.1)]) // 0.1 second it will take too long- as it might depend on the internet connection- in real world u can use like 5 seconds 
+   .then(res => console.log(res[0]))
+   .catch(err => console.error(err))
+/*basically making the get Json function race agans the timeout and if timeout wins it will be rejected */
+
+
+//Promise.allSettled - pretty new es2020- takes in an array of promises=> it will return an array of all the settled promises 
+ // no matter if they gt rejected or not- its similar to promise.all. 
+ //Promise.all will short circuit as soon as 1 promise rejects, but promise.allSettled simply-never short circuits- returns all the results of all promises.
+ 
+Promise.allSettled([
+  Promise.resolve('Success'),
+  Promise.reject('Reject'),
+  Promise.resolve('Another success'),
+]).then(res => console.log(res)).catch(err => console.error(err))
+
+
+
+//Promise.all will short circuit if there is one error, but allselected will return all settled
+
+
+//Promise.any- even more modern ES2021- it doesnt work at the time of the browser
+//takes in an array of multiple promises this one will return the 1st fulfilled promise and then IGNORE rejected promises
+
+Promise.any([
+  Promise.resolve('Success'),
+  Promise.reject('Reject'),
+  Promise.resolve('Another success'),
+]).then(res => console.log(res)).catch(err => console.error(err))
